@@ -34,7 +34,8 @@
 advance - предоплата автору
 royalty - доля общего дохода с продаж книги
 
-** Задание 1
+** Задания
+*** Задание 1
 
 Написать SQL код создания таблицы titles с учётом связей с таблицей publishers
 
@@ -48,21 +49,21 @@ CREATE TABLE titles(
 )
 #+end_src
 
-** Задание 2
+*** Задание 2
 
 Вывести список названий книг, для которых контракт пока не подписан.
 #+begin_src sql
 SELECT title_name FROM titles WHERE contract = 0
 #+end_src
 
-** Задание 3
+*** Задание 3
 Вывести названия книг биографий, который продаются дешевле 20 $
 
 #+begin_src sql
 SELECT title_name FROM titles WHERE price < 20 AND type = 'biography'
 #+end_src
 
-** Задание 4 
+*** Задание 4 
 Перечислить id книг которые являются биографией в порядке убывания дохода от продажи.
 
 Доход = Число * Цена одной копии
@@ -75,7 +76,7 @@ SELECT title_name FROM titles WHERE price < 20 AND type = 'biography'
 SELECT title_id, sales * price AS Revenue FROM titles WHERE type = 'biography' ORDER BY sales * price DESC
 #+end_src
 
-** Задание 5
+*** Задание 5
 
 Вывести минимальную цену книги.
 
@@ -83,13 +84,62 @@ SELECT title_id, sales * price AS Revenue FROM titles WHERE type = 'biography' O
 SELECT MIN(price) AS "Минимальная цена книги" FROM titles
 #+end_src
 
-** Задание 6
-
+*** Задание 6
+    
 Вывести средный и общий объём продаж книг, написанных по бизнесу.
 
 #+begin_src sql
 SELECT AVG(sales) AS "Средний", SUM(sales) AS "Общий" FROM titles WHERE type = "buisness"
 #+end_src
+
+*** Задание 7
+
+Вывести индефикаторы авторов, вывести то количество книг, которые написал этот автор в том числе 
+в соавторстве.
+
+#+begin_src sql
+SELECT au_id AS "Автор ID", COUNT(*) GROUP BY au_id
+#+end_src
+
+*** Задание 8
+
+Вычислить по каждому типу книг общее количество проданных экземпляров, среднее количество
+проданных экземпляров и количество книг такого типа.
+
+#+begin_src sql
+SELECT type AS "Тип книги", SUM(sales) AS "Общее количество проданных", 
+AVG(sales) AS "Среднее количество проданных", 
+COUNT(*) AS "Количество книг этого типа" 
+FROM titles 
+GROUP BY type;
+#+end_src
+
+*** Задание 9 (Задание 7 усложнённое)
+
+[[Задание 7]]
+Найти авторов, которые написали не менее 3 книг
+
+#+begin_src sql
+SELECT au_id AS "Автор ID", COUNT(*) GROUP BY au_id HAVING BY COUNT(*) >= 3;
+#+end_src
+
+*** Задание 10 (Задание 8 усложнённое)
+
+Для издательств PO3, PO4, общий объем продаж с разбивкой по типам. 
+Учесть только те книги итоговый объем > 10000 копий и 
+средняя цена одной копии менее 20$.
+
+#+begin_src sql
+SELECT SUM(sales) AS "Объем продаж" FROM titles 
+WHERE pub_id IN ('P03', 'P04') 
+GROUP BY type 
+HAVING BY SUM(sales) < 10000 AND AVG(price) < 20;  
+#+end_src
+
+#+begin_comment
+Порядок условий важен, так как иначе по моему мнению мы будем использовать 
+слишком много ресурсов ПК.
+#+end_comment
 
 ** Фильтрация групп с помощью HAVING
 
@@ -98,12 +148,5 @@ SELECT AVG(sales) AS "Средний", SUM(sales) AS "Общий" FROM titles WH
 2. GROUP BY - группирует выход WHERE
 3. HAVING - фильтрует после всего)
 
-** Задание 7
 
-Вывести индефикаторы авторов, вывести то количество книг, которые написал этот автор в том числе 
-в соавторстве.
-
-#+begin_src sql
-SELECT au_id AS "Автор ID", COUNT(*) GROUP BY au_id
-#+end_src
 

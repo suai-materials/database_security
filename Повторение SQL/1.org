@@ -98,6 +98,7 @@ SELECT AVG(sales) AS "Средний", SUM(sales) AS "Общий" FROM titles WH
 1. WHERE - фильтрует строки результата от FROM и JOIN
 2. GROUP BY - группирует выход WHERE
 3. HAVING - фильтрует после всего :)
+   фильтрует строки группированного результата, т.е. применяте условия фильтра к каждой **группе** строк
 
 ** Задание 7
 
@@ -105,6 +106,40 @@ SELECT AVG(sales) AS "Средний", SUM(sales) AS "Общий" FROM titles WH
 в соавторстве.
 
 #+begin_src sql
-SELECT au_id AS "Автор ID", COUNT(*) GROUP BY au_id
+SELECT au_id AS "Автор ID", COUNT(*) from titles GROUP BY au_id
 #+end_src
 
+
+** Задание 8
+
+По каждому типу книг вычислить общее кол-во проданных экземпляров, среднее кол-во, кол-во книг такого типа
+
+#+begin_src sql
+	SELECT typ`e,
+	SUM(sales) as "Общее кол-во",
+	AVG(sales),
+	COUNT(typ`e) from titles
+	       GROUP BY typ`e 
+#+end_src
+
+** Задание 9
+
+Вывести индефикаторы авторов, вывести то количество книг, которые написал этот автор в том числе 
+в соавторстве, причем каждый автор должен найти не менее 3 книг
+
+#+begin_src sql
+  SELECT au_id AS "Автор ID", COUNT(*) from titles
+	  GROUP BY au_id
+	  HAVING COUNT(*) > 3
+#+end_src
+
+** Задание 10
+
+#+begin_src sql
+  SELECT pub_id, typ`e, sum(sales) as Gen, avg(price) as Pr from titles
+	  where pub_id == "P03" or pub_id == "P04"
+	  group by typ`e
+	  having Gen > 10000 and Pr < 20
+
+
+#+end_src

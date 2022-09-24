@@ -1,0 +1,145 @@
+* Подзапросы
+
+**Подзапрос** - команда select, встроенная в другую команду SQL
+Подзапросы можно располагать в:
+- предложении SELECT, FROM, WHERE или HAVING другой команды selecet
+- другом подзапросе
+- команде INSERT, UPDATE, DELETE
+
+  
+** Задание 1
+
+Вывести список издательств, которые издают тип биографии
+
+#+begin_src sql
+  select  pub_id from publishers
+	where pub_id in (
+	      select pub_id from titles
+		     where type = "biography")
+#+end_src
+
+** Задание 2
+
+Отобразить список всех авторов, живущих в городе, где находится издательство
+
+#+begin_src sql
+  select au_name from authors
+	where city in (select city from publishers)
+#+end_src
+
+** Задание 3
+
+Отобразить авторов, которые не написали ни одной книги
+
+#+begin_src sql
+  select au_name from authors
+       where au_id not in (
+	      select au_id from title_authors
+       )
+#+end_src
+
+** Задание 4
+
+Удвоить цены всех книг, изданных компанией "New Age Books"
+
+#+begin_src sql
+	UPDATE titles
+	       SET price = price * 2
+	       where pub_id in
+	       (
+	       select pub_id from publishers
+	       where pub_name = "New Age Books"
+	       )
+#+end_src
+
+** Задание 5
+
+Найти имена писателей, которые принимали участие в написании по крайней мере одной поп книги
+
+#+begin_src sql
+  select au_name from authors
+       where au_id in (select au_id from title_authors
+	     where title_id in (
+		    select title_id from titles
+			   where type = "Pop")
+			   )
+
+#+end_src
+
+* Соединение таблиц
+
+Соединение таблиц можно рассматривать, как процесс сравнения данных
+в указанных столбцах этих таблиц и формирования новой таблицы из строк исходных таблиц
+которые дают положительный результат при сравнении
+
+Наиболее часто встречаются соединения с равенством.
+
+При выполнении соединения
+сначала образуется декартово произведение этих таблиц, т.е. всевозможные комбинации
+таблиц друг с другом. Само декартово произведение не содержит полезной инфо.
+По этой причине в соединении обязательно должно быть предложение WHERE
+(отбирает связанные между собой строки и указывает как именно они должны быть связаны)
+
+** Задание 1.
+
+Найти имена авторов и издателей, живущих в одном и том же городе
+
+#+begin_src sql
+  select au_name, pub_name
+  from authors, publishers
+  where authors.city = publishers.city
+#+end_src
+
+** Задание 2.
+
+Найти названия всех книг типа биография и имена из авторов
+
+#+begin_src sql
+  select au_name, title_name
+  from authors, title_authors, titles
+  where authors.au_id = titles_authors.au_id and titles.title_id = titles_authors.title_id and titles.type = "Bio"
+#+end_src
+
+
+** Виды соединений
+
+**Cross join** - декартово произведение (В результирующей выборке все комбинации строк)
+
+**Inner join** - соединяются только те строки, где найдены совпадающие значения столбца
+
+**Left(Outer) join** - включает в себя все строки из таблицы А
+                       (совпадающие и несовпадающие) + соовпадающие значения из таблицы Б
+		       Для строк из таблицы А, которым не найдено соответствие значение NULL
+		       заносится в столбцы, извлекаемые из таблицы Б
+		       
+**Right(outer) join** - то же, но для правой таблицы сохраняются все значения
+
+**Full(outer) join** - комбинация левого и правого соединения, т.е. присутствуют все
+                       строки из обеих таблиц(в несовпадающих строках значения столбцов
+		       заполяются NULL)
+		       
+**Union** - Обратное соединение по отношению к INNER JOIN, т.е. включает только те строки
+            из таблиц, для которых не найдено совпадений
+
+** Синтаксис
+
+tableA [тип соединения] JOIN tableB on предикат
+предикат определяет условия соединения строк из разных таблиц
+
+** Задание 1.
+
+#+begin_src sql
+  select au_id, city from authors Inner join publishers on
+       authors.city = publishers.city
+#+end_src
+
+** Задание 2.
+Вывести для каждлго издательства, сколько издано книг
+
+#+begin_src sql
+  select pub_id, count(title_id) as "Всего"
+  from publishers p  INNER JOIN titles t
+  on t.pub_id = p.pub_id
+  group by pub_id
+#+end_src
+

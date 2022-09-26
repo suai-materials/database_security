@@ -1,0 +1,23 @@
+* Подзапросы
+
+Подзапрос - это команда =SELECT=, встроенная в другую комманду SQL.
+
+Можно располагать запрос в:
+- предложении =SELECT=, =FROM=, =WHERE= или =HAVING= другой команды =SELECT=
+- другом подзапросе
+- команде =INSERT=, =UPDATE=, =DELETE=
+
+** Задания
+
+*** Задание 1
+
+Отобразить список издателей и биографий.
+
+#+begin_src sql
+SELECT pub_id FROM publishers WHERE pub_id IN 
+(SELECT pub_id FROM titles WHERE type="biography");
+#+end_src
+
+# Использовать join? 
+# Нет, так как такая тема
+

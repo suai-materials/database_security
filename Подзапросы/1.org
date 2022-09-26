@@ -1,0 +1,65 @@
+* Подзапросы
+
+Подзапрос - это команда =SELECT=, встроенная в другую комманду SQL.
+
+Можно располагать запрос в:
+- предложении =SELECT=, =FROM=, =WHERE= или =HAVING= другой команды =SELECT=
+- другом подзапросе
+- команде =INSERT=, =UPDATE=, =DELETE=
+
+** Задания
+
+*** Задание 1
+
+Отобразить список издателей и биографий.
+
+#+begin_src sql
+SELECT pub_id FROM publishers WHERE pub_id IN 
+(SELECT pub_id FROM titles WHERE type="biography");
+#+end_src
+
+# Использовать join? 
+# Нет, так как такая тема
+
+
+*** Задание 2 
+
+Отобразить всех авторов, живущих в городе, где находится издательство.
+
+#+begin_src sql
+SELECT * FROM authors 
+WHERE city IN (
+SELECT publishers.city FROM publishers GROUP BY publishers.city
+);
+#+end_src
+
+*** Задание 4
+
+Отобразить всех авторов, которые не написали ни одной книги
+
+#+begin_src sql
+SELECT * FROM authors 
+WHERE au_id NOT IN 
+(SELECT titles_authors.au_id FROM titles_authors);
+#+end_src
+
+*** Задание 5
+
+Удвоить цены всех книг изданных компанией "New Age Books"
+
+#+begin_src sql
+UPDATE titles SET price = price * 2 WHERE pub_id = (SELECT pub_id FROM publishers WHERE pub_name = 'New Age Books');
+#+end_src
+
+*** Задание 6
+
+Найти имена писателей, которые принимали участие в написании по крайней мере одной популярной книги popular_comp
+
+#+begin_src sql
+SELECT au_fname FROM authors 
+WHERE au_id in (
+    SELECT au_id FROM titles_authors
+      WHERE title_id in (
+         SELECT title_id FROM  titles 
+            WHERE type = 'popular_comp'));
+#+end_src
